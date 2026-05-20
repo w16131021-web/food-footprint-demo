@@ -34,9 +34,10 @@ if "food_material" not in impact_df.columns:
 if "display_name" not in impact_df.columns:
     impact_df["display_name"] = impact_df["food_material"]
 
-# 如果沒有 unit 欄位，就預設為 g
+# 如果沒有 unit 欄位，就預設為 kg
+# Impact factors in the backend database are assumed to be per kg.
 if "unit" not in impact_df.columns:
-    impact_df["unit"] = "g"
+    impact_df["unit"] = "kg"
 
 # 建立下拉選單顯示名稱
 # 例如：糙米 Husked rice (husked_rice)
@@ -137,11 +138,11 @@ taiwanese_pork_rice_basket = pd.DataFrame({
         get_food_label("soybean_oil")
     ],
     "amount_g": [
-        0.20,   # rice
-        0.105,  # pork, about 3 servings of meat
-        0.05,   # one egg
-        0.12,   # vegetable
-        0.01    # cooking oil
+        200,   # rice
+        105,   # pork, about 3 servings of meat
+        50,    # one egg
+        120,   # vegetable
+        10     # cooking oil
     ]
 })
 
@@ -156,11 +157,11 @@ western_beef_dairy_basket = pd.DataFrame({
         get_food_label("soybean_oil")
     ],
     "amount_g": [
-        0.20,   # potato as staple food
-        0.105,  # beef, about 3 servings of meat
-        0.24,   # one cup of milk
-        0.12,   # vegetable
-        0.01    # cooking oil
+        200,   # potato as staple food
+        105,   # beef, about 3 servings of meat
+        240,   # one cup of milk
+        120,   # vegetable
+        10     # cooking oil
     ]
 })
 
@@ -175,11 +176,11 @@ japanese_fish_rice_basket = pd.DataFrame({
         get_food_label("soybean_oil")
     ],
     "amount_g": [
-        0.20,   # rice
-        0.105,  # fish, about 3 servings of protein
-        0.05,   # one egg
-        0.12,   # vegetable
-        0.005   # lower cooking oil assumption
+        200,   # rice
+        105,   # fish, about 3 servings of protein
+        50,    # one egg
+        120,   # vegetable
+        5      # lower cooking oil assumption
     ]
 })
 
@@ -193,10 +194,10 @@ plant_protein_basket = pd.DataFrame({
         get_food_label("soybean_oil")
     ],
     "amount_g": [
-        0.20,   # staple food
-        0.105,  # soybean as plant protein
-        0.15,   # higher vegetable amount
-        0.01    # cooking oil
+        200,   # staple food
+        105,   # soybean as plant protein
+        150,   # higher vegetable amount
+        10     # cooking oil
     ]
 })
 
@@ -209,9 +210,9 @@ custom_list = pd.DataFrame({
         food_options[0]
     ],
     "amount_g": [
-        0.20,
-        0.10,
-        0.10
+        200,
+        100,
+        100
     ]
 })
 
@@ -242,8 +243,15 @@ def calculate_list_results(input_list):
     # Remove empty rows
     temp_list = temp_list.dropna(subset=["Food item", "amount_g"])
 
+    # Convert amount to numeric
+    temp_list["amount_g"] = pd.to_numeric(temp_list["amount_g"], errors="coerce").fillna(0)
+
     # Keep only rows with amount greater than 0
     temp_list = temp_list[temp_list["amount_g"] > 0]
+
+    # Convert gram input to kg for calculation
+    # Impact factors in the backend database are per kg.
+    temp_list["amount_kg"] = temp_list["amount_g"] / 1000
 
     # Map dropdown food label to backend food_material ID
     temp_list["food_material"] = temp_list["Food item"].map(label_to_material)
@@ -256,10 +264,10 @@ def calculate_list_results(input_list):
     )
 
     # Calculate impact for each impact category
-    # Formula: amount_g × impact factor per g
+    # Formula: amount_kg × impact factor per kg
     for category in impact_categories:
         merged_result[category + "_impact"] = (
-            merged_result["amount_g"] * merged_result[category]
+            merged_result["amount_kg"] * merged_result[category]
         )
 
     # Sum total impacts across all food items
@@ -346,10 +354,10 @@ edited_list = st.data_editor(
         ),
         "amount_g": st.column_config.NumberColumn(
             "Amount (g)",
-            help="Enter the amount of the selected food item in g.",
+            help="Enter the amount of the selected food item in grams.",
             min_value=0.0,
-            step=0.1,
-            format="%.3f",
+            step=10.0,
+            format="%.0f",
             required=True,
             width="medium"
         )
@@ -361,12 +369,18 @@ shopping_list = edited_list.copy()
 # 移除空白列
 shopping_list = shopping_list.dropna(subset=["Food item", "amount_g"])
 
+# 將輸入重量轉為數字
+shopping_list["amount_g"] = pd.to_numeric(shopping_list["amount_g"], errors="coerce").fillna(0)
+
 # 只保留重量大於 0 的列
 shopping_list = shopping_list[shopping_list["amount_g"] > 0]
 
 if len(shopping_list) == 0:
     st.warning("Please select at least one food item and enter an amount greater than 0.")
     st.stop()
+
+# 將 g 轉換成 kg，因為後台 impact factor 是 per kg
+shopping_list["amount_kg"] = shopping_list["amount_g"] / 1000
 
 # 將前端顯示名稱轉成後台 food_material ID
 shopping_list["food_material"] = shopping_list["Food item"].map(label_to_material)
@@ -408,11 +422,11 @@ if len(missing_rows) > 0:
 
 # ------------------------------------------------------------
 # 10. Calculate impacts
-# Formula: amount_g × impact factor per g
+# Formula: amount_kg × impact factor per kg
 # ------------------------------------------------------------
 for category in impact_categories:
-    merged[category + "_impact"] = merged["amount_g"] * merged[category]
-
+    merged[category + "_impact"] = merged["amount_kg"] * merged[category]
+    
 impact_cols = [category + "_impact" for category in impact_categories]
 
 total_impacts = merged[impact_cols].sum()

@@ -1,0 +1,58 @@
+input_keyword,food_material
+rice,husked_rice
+white rice,husked_rice
+husked rice,husked_rice
+白米,husked_rice
+米,husked_rice
+飯,husked_rice
+糙米,husked_rice
+beef,dairy_cow_meat
+cow meat,dairy_cow_meat
+red meat,dairy_cow_meat
+牛肉,dairy_cow_meat
+紅肉,dairy_cow_meat
+pork,pig_meat
+pig,pig_meat
+pig meat,pig_meat
+豬肉,pig_meat
+五花肉,pig_meat
+肉片,pig_meat
+chicken,chicken_meat
+chicken meat,chicken_meat
+chicken breast,chicken_meat
+雞肉,chicken_meat
+雞胸肉,chicken_meat
+雞腿肉,chicken_meat
+egg,egg
+eggs,egg
+雞蛋,egg
+蛋,egg
+milk,cow_milk
+cow milk,cow_milk
+dairy milk,cow_milk
+牛奶,cow_milk
+鮮奶,cow_milk
+soybean,soybean
+soy bean,soybean
+soy,soybean
+大豆,soybean
+黃豆,soybean
+tofu,soybean
+豆腐,soybean
+soybean oil,soybean_oil
+soy oil,soybean_oil
+oil,soybean_oil
+大豆油,soybean_oil
+沙拉油,soybean_oil
+vegetable,white_cabbage
+vegetables,white_cabbage
+cabbage,white_cabbage
+white cabbage,white_cabbage
+高麗菜,white_cabbage
+白菜,white_cabbage
+蔬菜,white_cabbage
+fish,fish
+seafood,fish
+魚,fish
+魚肉,fish
+水產,fish

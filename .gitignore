@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+Consequential Cumulative LCIA v3.12.xlsx
+*.xlsx
+app_*backup*.py
+app_before_*.py
+__pycache__/
+.venv/

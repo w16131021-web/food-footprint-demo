@@ -307,7 +307,7 @@ else:
     st.sidebar.info(
         "Auxiliary function: preset scenarios are used to demonstrate cuisine-based "
         "shopping list comparison for the thesis demo."
-    )
+    )  
 
     preset_scenario = st.sidebar.selectbox(
         "Choose a preset scenario",
@@ -764,6 +764,22 @@ st.caption(
     "This is a first MVP prototype. The explanation is currently rule-based. "
     "In the next version, this module can be connected to an LLM agent."
 )
+
+# ------------------------------------------------------------
+# Sidebar footer / copyright
+# ------------------------------------------------------------
+st.sidebar.markdown("---")
+
+st.sidebar.markdown(
+    """
+    **Author:** HONG-HUEI JI  
+    **Advisor:** PI-CHENG CHEN  
+    **National Cheng Kung University, Taiwan**  
+
+    © 2026 Food Shopping List Environmental Footprint Prototype
+    """
+)
+
 
 #calculate the kalories for a given recipe of food material amounts, and then give suggestions on how to adjust the recipe to meet a target kalorie level.
 
